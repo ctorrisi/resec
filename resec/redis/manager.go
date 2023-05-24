@@ -2,11 +2,11 @@ package redis
 
 import (
 	"fmt"
+	"github.com/redis/go-redis/v9"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis"
 	"github.com/seatgeek/resec/resec/state"
 )
 
@@ -17,7 +17,7 @@ func (m *Manager) emit() {
 
 // runAsMaster sets the instance to be the master
 func (m *Manager) runAsMaster() error {
-	if err := m.client.SlaveOf("no", "one").Err(); err != nil {
+	if err := m.client.SlaveOf(m.ctx, "no", "one").Err(); err != nil {
 		return err
 	}
 
@@ -30,7 +30,7 @@ func (m *Manager) runAsMaster() error {
 func (m *Manager) runAsSlave(masterAddress string, masterPort int) error {
 	m.logger.Infof("Enslaving redis to be slave of %s:%d", masterAddress, masterPort)
 
-	if err := m.client.SlaveOf(masterAddress, strconv.Itoa(masterPort)).Err(); err != nil {
+	if err := m.client.SlaveOf(m.ctx, masterAddress, strconv.Itoa(masterPort)).Err(); err != nil {
 		return fmt.Errorf("Could not enslave redis to be slave of %s:%d (%v)", masterAddress, masterPort, err)
 	}
 
@@ -42,8 +42,8 @@ func (m *Manager) runAsSlave(masterAddress string, masterPort int) error {
 // disconnect all normal connections
 func (m *Manager) disconnectUsers() error {
 	m.logger.Warnf("Disconnecting all clients")
-	cmd := redis.NewIntCmd("CLIENT", "KILL", "TYPE", "normal")
-	m.client.Process(cmd)
+	cmd := redis.NewIntCmd(m.ctx, "CLIENT", "KILL", "TYPE", "normal")
+	m.client.Process(m.ctx, cmd)
 	if err := cmd.Err(); err != nil {
 		return err
 	}
@@ -123,7 +123,7 @@ func (m *Manager) watchStatus() {
 	for {
 		select {
 		case <-timer.C:
-			result, err := m.client.Info("persistence", "replication").Result()
+			result, err := m.client.Info(m.ctx, "persistence", "replication").Result()
 			// any failure will trigger a disconnect event
 			if err != nil {
 				m.state.Healthy = false
@@ -154,6 +154,7 @@ func (m *Manager) watchStatus() {
 
 			// Update state with most recent output
 			m.state.Info = info
+			m.state.InfoString = result
 			m.emit()
 		}
 	}

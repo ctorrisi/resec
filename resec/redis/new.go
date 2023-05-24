@@ -1,9 +1,10 @@
 package redis
 
 import (
+	"context"
+	"github.com/redis/go-redis/v9"
 	"time"
 
-	"github.com/go-redis/redis"
 	"github.com/jpillora/backoff"
 	"github.com/seatgeek/resec/resec/state"
 	log "github.com/sirupsen/logrus"
@@ -23,6 +24,7 @@ func NewConnection(m *cli.Context) (*Manager, error) {
 			ReadTimeout:  1 * time.Second,
 			WriteTimeout: 1 * time.Second,
 		}),
+		ctx:    context.Background(),
 		config: redisConfig,
 		logger: log.WithFields(log.Fields{
 			"system":     "redis",

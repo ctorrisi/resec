@@ -259,7 +259,7 @@ func (m *Manager) setConsulCheckStatus(redisState state.Redis) {
 	}
 
 	m.logger.Debug("Updating Check TTL for service")
-	err := m.client.UpdateTTL(m.config.checkID, redisState.Info.Role, "passing")
+	err := m.client.UpdateTTL(m.config.checkID, redisState.InfoString, "passing")
 	m.handleConsulError(err)
 }
 

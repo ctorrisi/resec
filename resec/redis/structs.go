@@ -1,8 +1,9 @@
 package redis
 
 import (
-	"github.com/go-redis/redis"
+	"context"
 	"github.com/jpillora/backoff"
+	"github.com/redis/go-redis/v9"
 	"github.com/seatgeek/resec/resec/state"
 	log "github.com/sirupsen/logrus"
 )
@@ -13,6 +14,7 @@ type Manager struct {
 	client         *redis.Client    // redis client
 	config         *Config          // redis config
 	state          *state.Redis     // redis state
+	ctx            context.Context  // context
 	stateCh        chan state.Redis // redis state channel to publish updates to the reconciler
 	commandCh      chan Command
 	stopCh         chan interface{}
