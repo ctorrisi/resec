@@ -59,11 +59,12 @@ func NewConnection(c *cli.Context, redisConfig redis.Config) (*Manager, error) {
 		redisPort := strings.Split(redisConfig.Address, ":")[1]
 		// If REDIS_ADDR is declared as localhost register only port, and rely on consul to bring the agents IP
 		if redisHost == "127.0.0.1" || redisHost == "localhost" || redisHost == "::1" {
-			consulConfig.announceAddr = ":" + redisPort
+			announceAddr = ":" + redisPort
 		} else {
-			consulConfig.announceAddr = redisConfig.Address
+			announceAddr = redisConfig.Address
 		}
 	}
+	consulConfig.announceAddr = announceAddr
 
 	var err error
 	consulConfig.announceHost = strings.Split(consulConfig.announceAddr, ":")[0]
