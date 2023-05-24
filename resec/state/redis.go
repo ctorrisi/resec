@@ -6,11 +6,10 @@ import (
 
 // Redis state represent the full state of the connection with Redis
 type Redis struct {
-	Healthy    bool        // are we able to connect to Redis?
-	Ready      bool        // are we ready to provide state for the reconciler?
-	Info       RedisStatus // parse "info" data
-	InfoString string      `testdiff:"ignore"` // raw "info" data
-	Stopped    bool
+	Healthy bool        // are we able to connect to Redis?
+	Ready   bool        // are we ready to provide state for the reconciler?
+	Info    RedisStatus // parse "info" data
+	Stopped bool
 }
 
 // isRedisMaster return whether the Redis under management currently
