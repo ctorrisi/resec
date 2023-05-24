@@ -154,7 +154,6 @@ func (m *Manager) watchStatus() {
 
 			// Update state with most recent output
 			m.state.Info = info
-			m.state.InfoString = result
 			m.emit()
 		}
 	}
