@@ -123,7 +123,7 @@ func (m *Manager) watchStatus() {
 	for {
 		select {
 		case <-timer.C:
-			result, err := m.client.Info(m.ctx, "persistence", "replication").Result()
+			result, err := m.client.Info(m.ctx).Result()
 			// any failure will trigger a disconnect event
 			if err != nil {
 				m.state.Healthy = false
